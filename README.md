@@ -18,6 +18,7 @@ LandmarkRemark is a simple social location sharing app. You can save a note at y
 ### What took how long
 - The most time consuming aspect of the app for me was brushing up on my Java & Android Studio.
 - I did have some trouble with creating a custom info window and getting the device's location was confusing at first.
+- In total the whole thing took around 7ish hours.
 
 ### Limitations
 - Currently limited to loading 25 notes both initially and in search, can easily be increased but this is to favour performance for now
