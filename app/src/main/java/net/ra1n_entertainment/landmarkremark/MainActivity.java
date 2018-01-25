@@ -49,8 +49,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     // Location permission status
     private Boolean locationPermissionGranted = false;
 
-    // Permission request code
+    // Permission request & Intent code
     private static final int REQUEST_CODE = 333;
+    private static final int INTENT_RESOLVE_CODE = 999;
 
     // Backendless API key & App id
     private static final String API_KEY = "612FA3D5-CBAA-DF3A-FFFE-A179685D4700";
@@ -113,16 +114,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, SearchNotes.class);
-                startActivityForResult(intent, 999);
+                startActivityForResult(intent, INTENT_RESOLVE_CODE);
             }
         });
     }
 
+    /**
+     * Called when the search activity is finished
+     * @param requestCode - the request code we passed to the intent
+     * @param resultCode - OK/Canceled etc
+     * @param data - passed back the selected note
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 999 && resultCode == RESULT_OK) {
+        if (requestCode == INTENT_RESOLVE_CODE && resultCode == RESULT_OK) {
             Map note = (Map) data.getSerializableExtra("note");
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng((Double) note.get("latitude"),
@@ -131,6 +138,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    /**
+     * Shows the dialog for adding a marker
+     */
     public void showAddDialog() {
         dialog = new Dialog(this, R.style.AppTheme);
         dialog.setContentView(R.layout.alert);
@@ -154,6 +164,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         dialog.show();
     }
 
+    /**
+     * Adds a marker to the map view
+     * @param note - The note to get information from
+     */
     public void addMarker(Map note) {
         mMap.addMarker(
                 new MarkerOptions().position(
@@ -166,6 +180,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         ));
     }
 
+    /**
+     * Saves a new note to the backend
+     */
     public void saveNote() {
         // Get values to store in the backend
         final String title = AddDialogTitle.getText().toString();
@@ -237,6 +254,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         loadNotes();
     }
 
+    /**
+     * For checking permissions at runtime as Location permissions are a "DANGEROUS" type of permission
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         locationPermissionGranted = false;
@@ -251,6 +274,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         updateLocationUI();
     }
 
+    /**
+     * Enables myLocation and setMyLocation button if permissions are granted
+     */
     private void updateLocationUI() {
         if (mMap == null) {
             return;
@@ -270,6 +296,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Gets the devices last known location
+     */
     private void getDeviceLocation() {
         try {
             if (locationPermissionGranted) {
@@ -305,17 +334,24 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Remove the locationChange listener
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
         locationManager.removeUpdates((android.location.LocationListener) this);
     }
 
+    /**
+     * Called when the current device's location is changed
+     * @param location - Location object
+     */
     @Override
     public void onLocationChanged(Location location) {
-        if (location.equals(lastKnownLocation)) {
+        // If new location is different to lastKnown, zoom in on it
+        if (!location.equals(lastKnownLocation)) {
             lastKnownLocation = location;
-
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(lastKnownLocation.getLatitude(),
                             lastKnownLocation.getLongitude()), DEFAULT_ZOOM));

@@ -23,6 +23,7 @@ public class NoteInfoAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoContents(Marker marker) {
+        // Inflate the view
         if (infoWindow == null) {
             infoWindow = inflater.inflate(R.layout.activity_note_info_adapter, null);
         }

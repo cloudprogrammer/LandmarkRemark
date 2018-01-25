@@ -15,6 +15,10 @@ import android.widget.Toast;
 
 public class PickUsername extends Activity {
 
+    /**
+     * Pretty straight forward
+     * @param savedInstanceState - savedInstanceState
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

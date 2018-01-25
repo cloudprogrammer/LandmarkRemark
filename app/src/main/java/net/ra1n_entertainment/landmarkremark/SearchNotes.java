@@ -24,8 +24,10 @@ import java.util.Map;
 
 public class SearchNotes extends AppCompatActivity {
 
+    // Array of the notes found
     Map[] notes = {};
 
+    // Our listView adapter
     ListItemAdapter adapter;
 
     @Override
@@ -35,11 +37,12 @@ public class SearchNotes extends AppCompatActivity {
 
         ListView listView = findViewById(R.id.searchListView);
 
+        // ListView item onClick listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // Get the selected note then pass it back and finish this activity
                 Map note = adapter.getItem(i);
-
                 Intent intent = new Intent();
                 intent.putExtra("note", (Serializable) note);
                 setResult(RESULT_OK, intent);
@@ -51,6 +54,8 @@ public class SearchNotes extends AppCompatActivity {
         final CheckBox checkBox = findViewById(R.id.searchUsernameSearchCheckBox);
 
         searchView.setQueryHint("Search by username");
+
+        // Search view query listener
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -67,6 +72,7 @@ public class SearchNotes extends AppCompatActivity {
         adapter = new ListItemAdapter();
         listView.setAdapter(adapter);
 
+        // If checkbox is checked, search by username else search by description
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,19 +86,28 @@ public class SearchNotes extends AppCompatActivity {
 
     }
 
+    /**
+     * Search backend notes
+     * @param query - The string query
+     * @param usernameSearch - A username search or description search
+     */
     public void searchNotes(String query, boolean usernameSearch) {
         DataQueryBuilder dataQuery = DataQueryBuilder.create();
-
+        dataQuery.setPageSize(25);
+        // If usernameSearch is true set the query to search by username else by description
         if (usernameSearch) {
             dataQuery.setWhereClause("username = '" + query + "'");
         } else {
             dataQuery.setWhereClause("description LIKE '" + query + "%'");
         }
 
+        // The call to backendless for the search
         Backendless.Data.of("Notes").find(dataQuery, new AsyncCallback<List<Map>>() {
             @Override
             public void handleResponse(List<Map> response) {
+                // If the response is bigger than 0
                 if (response.size() > 0) {
+                    // Set the notes array to the returned notes and update the listView adapter
                     notes = response.toArray(new Map[response.size()]);
                     adapter.notifyDataSetChanged();
                 }
@@ -105,6 +120,9 @@ public class SearchNotes extends AppCompatActivity {
         });
     }
 
+    /**
+     * Adapter for listView
+     */
     class ListItemAdapter extends BaseAdapter {
 
         @Override
