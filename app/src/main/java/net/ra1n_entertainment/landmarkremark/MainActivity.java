@@ -249,7 +249,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.setInfoWindowAdapter(new NoteInfoAdapter(getLayoutInflater()));
         getLocationPermission();
-        updateLocationUI();
         getDeviceLocation();
         loadNotes();
     }

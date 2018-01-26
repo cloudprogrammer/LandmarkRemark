@@ -20,7 +20,7 @@
 
         <activity
             android:name=".PickUsername"
-            android:label="Pick A Username">
+            android:label="Landmark Remark">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
